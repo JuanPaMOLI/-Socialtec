@@ -16,8 +16,9 @@ def user_profile():
     tk.Button(header, text="Inicio", font=("Arial", 12), bg="#4e8ef7", fg="white", bd=0).pack(side="right", padx=10)
     tk.Button(header, text="Salir", font=("Arial", 12), bg="#e63946", fg="white", bd=0, command=root.quit).pack(side="right", padx=10)
 
-    search_entry = tk.Entry(header).pack(padx=10)
-    tk.Button(header, text="buscar", font=("Arial", 12), bg="#4e8ef7", fg="white", bd=0).pack(padx=10)
+    tk.Button(header, text="buscar", font=("Arial", 12), bg="#4e8ef7", fg="white", bd=0).pack(padx=10, pady=10, side="right")
+    search_entry = tk.Entry(header).pack(padx=10, pady=20)
+    
 
     # Profile section
     profile_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
