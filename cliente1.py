@@ -120,7 +120,7 @@ class ClientApp:
 
     def open_social_network(self):
         self.root.destroy()  # Cierra la ventana principal
-        redsocial.user_profile()  # Llama a la función principal en red_social.py
+        redsocial.start_app()  # Llama a la función principal en red_social.py
 
 # Inicializar base de datos y ejecutar la app
 if __name__ == "__main__":
