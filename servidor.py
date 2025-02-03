@@ -4,7 +4,7 @@ import sqlite3
 from passlib.hash import bcrypt
 
 # Base de datos local para usuarios
-DATABASE = "usuarios_server.db"
+DATABASE = "usuarios.db"
 
 # Crear base de datos y tabla si no existen
 def init_database():
@@ -44,7 +44,7 @@ def validate_user(username, password):
         stored_password = result[0]
         if bcrypt.verify(password, stored_password):  # Comparar la contraseña ingresada con la cifrada
             return "Inicio de sesión exitoso."
-    return "Error: Usuario o contraseña incorrectos."
+    return "Error: Usuario o contraseña incorrectos"
 
 # Manejo de clientes
 def handle_client(client_socket):
@@ -89,9 +89,9 @@ def handle_client(client_socket):
 def start_server():
     init_database()
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("127.0.0.1", 5000))
+    server.bind(("localhost", 8567))
     server.listen(5)
-    print("[SERVIDOR] Esperando conexiones en 127.0.0.1:5000")
+    print("[SERVIDOR] Esperando conexiones en localhost:8567")
 
     while True:
         client_socket, client_address = server.accept()

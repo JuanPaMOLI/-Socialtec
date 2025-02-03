@@ -1,3 +1,5 @@
+import socket
+import threading
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -6,6 +8,7 @@ import redsocial  # Importamos el archivo redsocial.py
 
 # Base de datos local para usuarios
 DATABASE = "usuarios.db"
+
 
 # Crear base de datos y tabla si no existen
 def init_database():
@@ -35,16 +38,19 @@ def save_user(username, password):
         conn.close()
 
 # Validar usuario y contraseña en la base de datos
-def validate_user(username, password):
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT password FROM usuarios WHERE username = ?", (username,))
-    result = cursor.fetchone()
-    conn.close()
-    if result:
-        stored_password = result[0]
-        return bcrypt.verify(password, stored_password)
-    return False
+def validate_user(sock, username, password):
+    send_str = "LOGIN " + username + " " + password
+    sock.send(send_str.encode())
+    while True:
+        data = sock.recv(1024)
+        if not data:
+            break
+        print(data.decode())
+        if data.decode() == "Inicio de sesión exitoso.":
+            return True
+        elif data.decode() == "Error: Usuario o contraseña incorrectos":
+            return False
+     
 
 # Clase para la interfaz gráfica del cliente
 class ClientApp:
@@ -53,6 +59,11 @@ class ClientApp:
         self.root.title("InstaFace - Cliente")
         self.root.geometry("400x500")
         self.root.configure(bg="#f0f0f0")
+
+        # Socket
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect(("localhost", 8567))
+
 
         # Pantalla de inicio
         self.show_login_screen()
@@ -108,12 +119,13 @@ class ClientApp:
     def login(self):
         username = self.username_entry.get().strip()
         password = self.password_entry.get().strip()
+        sock = self.client
 
         if not username or not password:
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        if validate_user(username, password):
+        if validate_user(sock, username, password):
             self.open_social_network()
         else:
             messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
