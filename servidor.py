@@ -2,6 +2,9 @@ import socket
 import threading
 import sqlite3
 from passlib.hash import bcrypt
+import networkx as nx
+import matplotlib.pyplot as plt
+import tkinter as tk
 
 # Base de datos local para usuarios
 DATABASE = "usuarios.db"
@@ -46,6 +49,21 @@ def validate_user(username, password):
             return "Inicio de sesión exitoso."
     return "Error: Usuario o contraseña incorrectos"
 
+# Anadir amigos
+def friend_user(username, friend):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT friends FROM usuarios WHERE username = ?", (username))
+    result = cursor.fetchone()
+    try:
+        cursor.execute("UPDATE usuarios SET friends = ? WHERE username = ?", (result + "," + friend, username))
+        conn.commit()
+        return "Amigo añadido exitosamente."
+    except sqlite3.IntegrityError:
+        return "Error"
+    finally:
+        conn.close()
+
 # Manejo de clientes
 def handle_client(client_socket):
     print("[NUEVO CLIENTE] Conexión establecida")
@@ -74,6 +92,11 @@ def handle_client(client_socket):
                     response = "Error: Uso correcto: LOGIN <usuario> <contraseña>"
                 else:
                     response = validate_user(args[0], args[1])
+            elif command == "FRIEND":
+                if len(args) != 2:
+                    response = "Error: Uso correcto: FRIEND <usuario> <amigo>"
+                else:
+                    response = friend_user(args[0], args[1])
             else:
                 response = "Error: Comando no reconocido."
 
